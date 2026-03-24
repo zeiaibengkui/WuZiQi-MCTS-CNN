@@ -7,6 +7,7 @@ import torch
 
 import config
 
+
 class GomokuGame:
     def __init__(self):
         self.board = np.zeros((config.BOARD_SIZE, config.BOARD_SIZE), dtype=int)
@@ -108,8 +109,8 @@ class GomokuGame:
             return critical["block"][0]
         if critical["open_four"]:
             return critical["open_four"][0]
-        # if critical["open_three"]:
-            # return critical["open_three"][0]
+        if critical["open_three"]:
+            return critical["open_three"][0]
         return None
 
     def is_terminal(self):
@@ -124,7 +125,11 @@ class GomokuGame:
                     count = 1
                     for i in range(1, 5):
                         nr, nc = r + dr * i, c + dc * i
-                        if 0 <= nr < config.BOARD_SIZE and 0 <= nc < config.BOARD_SIZE and self.board[nr, nc] == player:
+                        if (
+                            0 <= nr < config.BOARD_SIZE
+                            and 0 <= nc < config.BOARD_SIZE
+                            and self.board[nr, nc] == player
+                        ):
                             count += 1
                         else:
                             break
@@ -168,7 +173,9 @@ class GomokuGame:
             return 0
         if self.winner == 0:
             return 0
-        return 1 if self.winner == self.current_player else -1  # reward relative to last player
+        return (
+            1 if self.winner == self.current_player else -1
+        )  # reward relative to last player
 
 
 def print_board(board):
