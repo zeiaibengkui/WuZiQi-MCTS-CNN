@@ -1,2 +1,6 @@
 *.pth
 .venv
+__pycache__
+
+.claude
+.vscode
