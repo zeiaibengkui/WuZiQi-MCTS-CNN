@@ -45,7 +45,7 @@ class MCTS:
         self.n_simulations = n_simulations
         self.root: MCTSNode = MCTSNode()
 
-    def search(self, game_state):
+    def search(self, game_state: game.GomokuGame):
         self.root = MCTSNode()
         for _ in range(self.n_simulations):
             game_copy = copy.deepcopy(game_state)

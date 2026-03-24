@@ -15,6 +15,7 @@ This is a Gomoku (五子棋) AI trainer using Monte Carlo Tree Search (MCTS) wit
 - `game.py`: Gomoku game logic
 - `config.py`: Configuration constants
 - `play.py`: Human vs AI play interface
+- `streamlit_app.py`: Streamlit web interface for visualization and play
 
 ## Parallel Models Competition
 
@@ -82,6 +83,18 @@ python play.py
 # List saved models in best_length_models directory
 ls best_length_models/
 ```
+
+### Web Interface (Streamlit)
+```bash
+# Launch the interactive web dashboard
+streamlit run streamlit_app.py
+```
+
+The Streamlit app provides:
+- **Training Dashboard**: Visualize competition statistics, win rates, longest game progression
+- **Human vs AI Play**: Interactive Gomoku board to play against the trained AI
+- **Real-time Metrics**: Charts showing model performance over training iterations
+- **Longest Game Visualization**: Board display of the longest game from the last competition round
 
 ## Development Notes
 

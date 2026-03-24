@@ -45,6 +45,7 @@ class Trainer:
         self.game_data = [
             [] for _ in range(len(self.population))
         ]  # store game data for training losers
+        self.longest_game = None  # store the longest game object from last competition round
 
     def self_play(self):
         g = game.GomokuGame()
@@ -363,6 +364,7 @@ class Trainer:
         Returns the longest game played in this round (or None)."""
         n = len(self.population)
         if n <= 1:
+            self.longest_game = None
             return None
         # clear previous game data
         for i in range(n):
@@ -425,6 +427,7 @@ class Trainer:
                     longest_moves = moves2
                     longest_game = game2
 
+        self.longest_game = longest_game
         return longest_game
 
     def _update_best_index(self):

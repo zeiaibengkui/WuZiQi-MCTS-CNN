@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "ipykernel>=7.2.0",
+    "matplotlib>=3.10.8",
     "numpy>=2.4.0",
+    "streamlit>=1.55.0",
     "torch>=2.10.0",
 ]
