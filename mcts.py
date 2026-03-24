@@ -76,8 +76,8 @@ class MCTS:
                     valid_moves = critical["block"]
                 elif critical["open_four"]:
                     valid_moves = critical["open_four"]
-                elif critical["open_three"]:
-                    valid_moves = critical["open_three"]
+                # elif critical["open_three"] :
+                #     valid_moves = critical["open_three"]
                 else:
                     # only keep first move fixed in center; second move forced in center 5x5;
                     # from move 3 onward, search neighbourhood of opponent's last move and own last move

@@ -9,6 +9,7 @@ import game
 import train
 import mcts
 
+
 def human_vs_ai():
     trainer = train.Trainer()
     trainer.load_model()
@@ -23,8 +24,8 @@ def human_vs_ai():
     # let player choose color
     human_color = 1
     ai_color = -1
-    choice = input("Choose first move (1) or second (-1): \nFirst move should be 7h, second move r>=c>=0")
-    if choice == '-1':
+    choice = input("Choose first move (1) or second (-1): \nFirst move should be 7h")
+    if choice == "-1":
         human_color = -1
         ai_color = 1
         print("AI plays black first.")
@@ -40,16 +41,18 @@ def human_vs_ai():
     while not g.is_terminal():
         if g.current_player == human_color:
             try:
-                inp = input("(q to exit) Your turn (row number + column letter): ").strip()
+                inp = input(
+                    "(q to exit) Your turn (row number + column letter): "
+                ).strip()
                 if inp == "q":
                     print("Pressed Q. Exiting...\n")
                     return
-                match = re.match(r'(\d+)([a-o])', inp)
+                match = re.match(r"(\d+)([a-o])", inp)
                 if not match:
                     print("Invalid format, please try again.")
                     continue
                 r = int(match.group(1))
-                c = ord(match.group(2)) - ord('a')
+                c = ord(match.group(2)) - ord("a")
                 if not (0 <= r < config.BOARD_SIZE and 0 <= c < config.BOARD_SIZE):
                     print("Coordinates out of range, please try again.")
                     continue
