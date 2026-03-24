@@ -19,3 +19,35 @@
 - `PARALLEL_MODELS`: 并行模型数量（默认3）
 - `COMPETITION_FREQUENCY`: 竞争频率（默认每10次迭代）
 - `ELIMINATION_THRESHOLD`: 淘汰阈值（默认0.7，即输掉70%对局）
+
+## Example
+
+```bash
+~/Documents/algo/learnAI/practice/WuZiQi-MCTS-CNN master*                                     learnai 21:57:13
+$ "echo" 1 | python ./main.py
+1. Train AI (self-play)
+2. Human vs AI
+Please choose (1/2): Model loaded and copied to all parallel models.
+
+--- Competition round (iteration 1) ---
+Best model: 2 (win rate: 0.72)
+New longest game (187 moves)，model saved: best_length_models/gomoku_model_max_moves_187.pth
+    a b c d e f g h i j k l m n o 
+ 0  ○ ● ○ ○ ● ● ○ ○ ● ○ ● ● ● ○ ○
+ 1  ● ● ● ● ○ ○ ○ ○ ● ● ● ● ○ ● ●
+ 2  ○ ○ ● ● ● ● ○ ○ ○ ● ● ● ● ○ ○
+ 3  ● ● ● ● ○ ○ ● ● ● ● ○ ● ○ ● ○
+ 4  ○ ● . ○ ● ○ ○ ○ ○ ● ● ○ ○ ○ ○
+ 5  ● ● ○ ○ ○ ○ ● ● ○ ○ ○ ○ ● . ●
+ 6  ○ ○ ● ○ ○ ● ○ ○ ○ ● . . . . ○
+ 7  ● ○ ○ ○ ● ● ● ● ○ . . . ○ . ○
+ 8  ○ ● ● ● ○ . ● ○ ● . . ● . . ●
+ 9  ○ ○ ○ ● ○ ○ ○ ○ ● . ● . . . ●
+10  ● ● ● ● ○ ● ○ . ● ● . . . . ○
+11  ○ ○ ● ○ ○ . . ● ● . . . . . ○
+12  ● ● ○ ○ ● ○ . ● ○ . . . . . ●
+13  ● ● ○ ○ ● ○ ○ ● ● ● ● ○ . ● ●
+14  ● ○ ○ ○ ● ● ○ ○ ○ ● ● ○ ○ ● ○
+Average loss: 5.9973 (Val: 0.2465, Pol: 5.7508)
+Model saved to gomoku_model.pth
+```

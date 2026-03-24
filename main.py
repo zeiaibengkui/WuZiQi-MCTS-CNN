@@ -20,11 +20,11 @@ if __name__ == "__main__":
         trainer.load_model()
 
         for i in range(config.TRAIN_ITERATIONS):
-            print(f"\n--- Training iteration {i+1}/{config.TRAIN_ITERATIONS} ---")
+            # print(f"\n--- Training iteration {i+1}/{config.TRAIN_ITERATIONS} ---")
 
             # config.MCTS_SIMULATIONS = random.randrange(150, 200)
             trainer.mcts.n_simulations = config.MCTS_SIMULATIONS
-            print(f"starting next | MCTS Sims: {config.MCTS_SIMULATIONS}")
+            # print(f"starting next | MCTS Sims: {config.MCTS_SIMULATIONS}")
             trainer.train_step()
             sleep(0.7)
     elif choice == "2":

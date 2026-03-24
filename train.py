@@ -92,7 +92,7 @@ class Trainer:
 
     def train_step(self):
         """Run competition round and train losing models using their loss data."""
-        print(f"Iteration {self.iteration + 1}")
+        # print(f"Iteration {self.iteration + 1}")
 
         # Run competition round every COMPETITION_FREQUENCY iterations
         longest_game = None
@@ -122,9 +122,9 @@ class Trainer:
                         f"New longest game ({longest_moves} moves)，model saved: {best_path}"
                     )
                 # output example game (the longest game)
-                print("Example game final state:")
+                # print("Example game final state:")
                 game.print_board(longest_game.board)
-                print("Move order:")
+                """ print("Move order:")
                 for step, (r, c, p) in enumerate(longest_game.move_history):
                     player = "black" if p == 1 else "white"
                     print(f"Move {step+1}: {player} ({r}{chr(ord('a') + c)})")
@@ -133,7 +133,7 @@ class Trainer:
                 elif longest_game.winner == 1:
                     print("Result: black wins")
                 else:
-                    print("Result: white wins")
+                    print("Result: white wins") """
 
         # Train losing models using their loss data
         total_loss = 0.0
@@ -194,9 +194,6 @@ class Trainer:
         ):
             self.eliminate_weak_models()
 
-        # Save main model (population[0]) which may have been updated with best weights
-        torch.save(self.population[0].state_dict(), config.MODEL_PATH)
-
         self.iteration += 1
 
         if trained_any:
@@ -227,6 +224,7 @@ class Trainer:
         else:
             print("No training data for losing models.")
 
+        torch.save(self.population[self.best_index].state_dict(), config.MODEL_PATH)
         print(f"Model saved to {config.MODEL_PATH}")
 
     def load_model(self):
@@ -376,6 +374,7 @@ class Trainer:
         # Play each pair twice (swap colors) to be fair.
         for i in range(n):
             for j in range(i + 1, n):
+                sleep(0.7)
                 # first game: i as black, j as white
                 result1, (data_i, data_j), game1 = self._play_match_with_data(i, j)
                 win1, loss1, draw1 = result1
