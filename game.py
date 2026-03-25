@@ -67,10 +67,10 @@ class GomokuGame:
             length, open_ends = self._line_properties(tmp, r, c, dr, dc, player)
             if length >= 5:
                 return "five"
-            if length == 4 and open_ends >= 1:
-                return "open_four"
             if length == 4 and open_ends >= 2:
                 return "dead_four"
+            if length == 4 and open_ends >= 1:
+                return "open_four"
             if length == 3 and open_ends == 2:
                 return "open_three"
         return None
@@ -85,7 +85,7 @@ class GomokuGame:
         open_three_moves = []
 
         for move in self.get_valid_moves():
-            if self.evaluate_move(move, cur):
+            if self.evaluate_move(move, cur) == "five":
                 win_moves.append(move)
             elif self.evaluate_move(move, opp) == "five":
                 block_moves.append(move)

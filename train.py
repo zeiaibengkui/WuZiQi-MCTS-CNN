@@ -106,8 +106,11 @@ class Trainer:
             print(f"\n--- Competition round (iteration {self.iteration + 1}) ---")
             longest_game = self.competition_round()
             self._update_best_index()
+            winrate = lambda idx: self.wins[idx] / (
+                self.wins[idx] + self.losses[idx] + self.draws[idx]
+            )
             print(
-                f"Best model: {self.best_index} (win rate: {self.wins[self.best_index] / (self.wins[self.best_index] + self.losses[self.best_index] + self.draws[self.best_index]):.2f})"
+                f"Best model: {self.best_index} (win rate: {winrate(self.best_index):.2f})"
             )
             # record longest game if available
             if longest_game is not None:
@@ -389,12 +392,16 @@ class Trainer:
                 self.draws[j] *= hist
 
                 for game_idx in range(config.GAMES_PER_ITER):
+                    print(f"Game {game_idx+1}", end="\r")
+
                     # Determine colors: even game_idx -> i black, j white; odd -> j black, i white
                     if game_idx % 2 == 0:
                         black_idx, white_idx = i, j
                     else:
                         black_idx, white_idx = j, i
-                    result, (data_black, data_white), game_state = self._play_match_with_data(black_idx, white_idx)
+                    result, (data_black, data_white), game_state = (
+                        self._play_match_with_data(black_idx, white_idx)
+                    )
                     win, loss, draw = result
 
                     # Update stats from perspective of i (since result is from black's perspective)
