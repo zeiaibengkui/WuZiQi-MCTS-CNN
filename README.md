@@ -23,7 +23,6 @@
 ## Example
 
 ```bash
-~/Documents/algo/learnAI/practice/WuZiQi-MCTS-CNN master*                                     learnai 21:57:13
 $ "echo" 1 | python ./main.py
 1. Train AI (self-play)
 2. Human vs AI
@@ -51,3 +50,9 @@ New longest game (187 moves)，model saved: best_length_models/gomoku_model_max_
 Average loss: 5.9973 (Val: 0.2465, Pol: 5.7508)
 Model saved to gomoku_model.pth
 ```
+
+### Training
+
+Win Rate  
+![win rate](./train_plot.png)  
+The training for one model is not so smooth. That's why we keep the old but presently good model.

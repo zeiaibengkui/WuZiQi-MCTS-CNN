@@ -45,7 +45,9 @@ class Trainer:
         self.game_data = [
             [] for _ in range(len(self.population))
         ]  # store game data for training losers
-        self.longest_game = None  # store the longest game object from last competition round
+        self.longest_game = (
+            None  # store the longest game object from last competition round
+        )
 
     def self_play(self):
         g = game.GomokuGame()
@@ -219,9 +221,9 @@ class Trainer:
                     if idx != self.best_index and self.game_data[idx]
                 ]
             )
-            print(
+            """  print(
                 f"Average loss: {avg_loss:.4f} (Val: {avg_val:.4f}, Pol: {avg_pol:.4f})"
-            )
+            ) """
         else:
             print("No training data for losing models.")
 
@@ -373,15 +375,11 @@ class Trainer:
         longest_game = None
         longest_moves = 0
 
-        # Play each pair twice (swap colors) to be fair.
+        # Play each pair GAMES_PER_ITER times (alternating colors).
         for i in range(n):
             for j in range(i + 1, n):
                 sleep(0.7)
-                # first game: i as black, j as white
-                result1, (data_i, data_j), game1 = self._play_match_with_data(i, j)
-                win1, loss1, draw1 = result1
-
-                # reduce history
+                # reduce history once per pair
                 hist = 0.8
                 self.wins[i] *= hist
                 self.losses[i] *= hist
@@ -390,42 +388,47 @@ class Trainer:
                 self.losses[j] *= hist
                 self.draws[j] *= hist
 
-                self.wins[i] += win1
-                self.losses[i] += loss1
-                self.draws[i] += draw1
-                self.wins[j] += loss1  # loss for i is win for j
-                self.losses[j] += win1
-                self.draws[j] += draw1
-                # store loss data: if i lost (loss1==1), store data_i; if j lost (win1==1), store data_j
-                if loss1 == 1:  # i lost
-                    self.game_data[i].append(data_i)
-                elif win1 == 1:  # j lost
-                    self.game_data[j].append(data_j)
-                # draws: no loss data stored
-                # track longest game
-                moves1 = len(game1.move_history)
-                if moves1 > longest_moves:
-                    longest_moves = moves1
-                    longest_game = game1
+                for game_idx in range(config.GAMES_PER_ITER):
+                    # Determine colors: even game_idx -> i black, j white; odd -> j black, i white
+                    if game_idx % 2 == 0:
+                        black_idx, white_idx = i, j
+                    else:
+                        black_idx, white_idx = j, i
+                    result, (data_black, data_white), game_state = self._play_match_with_data(black_idx, white_idx)
+                    win, loss, draw = result
 
-                # second game: swap colors
-                result2, (data_j2, data_i2), game2 = self._play_match_with_data(j, i)
-                win2, loss2, draw2 = result2
-                self.wins[j] += win2
-                self.losses[j] += loss2
-                self.draws[j] += draw2
-                self.wins[i] += loss2
-                self.losses[i] += win2
-                self.draws[i] += draw2
-                if loss2 == 1:  # j lost
-                    self.game_data[j].append(data_j2)
-                elif win2 == 1:  # i lost
-                    self.game_data[i].append(data_i2)
-                # track longest game
-                moves2 = len(game2.move_history)
-                if moves2 > longest_moves:
-                    longest_moves = moves2
-                    longest_game = game2
+                    # Update stats from perspective of i (since result is from black's perspective)
+                    if black_idx == i:
+                        # i is black
+                        self.wins[i] += win
+                        self.losses[i] += loss
+                        self.draws[i] += draw
+                        self.wins[j] += loss  # loss for i is win for j
+                        self.losses[j] += win
+                        self.draws[j] += draw
+                        # store loss data
+                        if loss == 1:  # i lost
+                            self.game_data[i].append(data_black)
+                        elif win == 1:  # j lost
+                            self.game_data[j].append(data_white)
+                    else:
+                        # j is black
+                        self.wins[j] += win
+                        self.losses[j] += loss
+                        self.draws[j] += draw
+                        self.wins[i] += loss  # loss for j is win for i
+                        self.losses[i] += win
+                        self.draws[i] += draw
+                        if loss == 1:  # j lost
+                            self.game_data[j].append(data_black)
+                        elif win == 1:  # i lost
+                            self.game_data[i].append(data_white)
+                    # draws: no loss data stored
+                    # track longest game
+                    moves = len(game_state.move_history)
+                    if moves > longest_moves:
+                        longest_moves = moves
+                        longest_game = game_state
 
         self.longest_game = longest_game
         return longest_game

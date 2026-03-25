@@ -35,7 +35,7 @@ The trainer maintains a population of `PARALLEL_MODELS` (default 3) neural netwo
 - `MODEL_PATH`: "gomoku_model.pth"
 - `BEST_LENGTH_MODEL_DIR`: directory for models that achieved longest games
 - `TRAIN_ITERATIONS`: total training iterations (default 700)
-- `GAMES_PER_ITER`: (unused in current version, kept for compatibility) originally number of self‑play games per iteration (default 5)
+- `GAMES_PER_ITER`: number of games played per model pair in each competition round (default 5)
 - `MCTS_SIMULATIONS`: MCTS simulations per move (default 30)
 - `C_PUCT`: exploration constant (default 1.0)
 - `PARALLEL_MODELS`: number of parallel models in the population (default 3)

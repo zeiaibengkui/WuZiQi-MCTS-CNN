@@ -63,17 +63,17 @@ class GomokuGame:
         tmp[r, c] = player
 
         directions = [(1, 0), (0, 1), (1, 1), (1, -1)]
-        best = None
         for dr, dc in directions:
             length, open_ends = self._line_properties(tmp, r, c, dr, dc, player)
             if length >= 5:
                 return "five"
             if length == 4 and open_ends >= 1:
-                best = "open_four"
-            if length == 3 and open_ends == 2 and best != "open_four":
-                best = "open_three"
-
-        return best
+                return "open_four"
+            if length == 4 and open_ends >= 2:
+                return "dead_four"
+            if length == 3 and open_ends == 2:
+                return "open_three"
+        return None
 
     def find_critical_moves(self):
         cur = self.current_player
@@ -85,10 +85,14 @@ class GomokuGame:
         open_three_moves = []
 
         for move in self.get_valid_moves():
-            if self.evaluate_move(move, cur) == "five":
+            if self.evaluate_move(move, cur):
                 win_moves.append(move)
             elif self.evaluate_move(move, opp) == "five":
                 block_moves.append(move)
+            elif self.evaluate_move(move, opp) == "dead_four":
+                block_moves.append(move)
+            elif self.evaluate_move(move, cur) == "dead_four":
+                win_moves.append(move)
             elif self.evaluate_move(move, cur) == "open_four":
                 open_four_moves.append(move)
             elif self.evaluate_move(move, cur) == "open_three":
@@ -107,10 +111,10 @@ class GomokuGame:
             return critical["win"][0]
         if critical["block"]:
             return critical["block"][0]
-        if critical["open_four"]:
-            return critical["open_four"][0]
-        if critical["open_three"]:
-            return critical["open_three"][0]
+        # if critical["open_four"]:
+        #     return critical["open_four"][0]
+        # if critical["open_three"]:
+        #     return critical["open_three"][0]
         return None
 
     def is_terminal(self):
