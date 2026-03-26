@@ -147,11 +147,11 @@ class MCTS:
 
     def get_action_distribution(self, game_state: game.GomokuGame, temperature=1):
         # priority move from game's critical moves (human vs AI will also go through this)
-        priority_move = game_state.get_priority_move()
+        """priority_move = game_state.get_priority_move()
         if priority_move is not None:
             dist = np.zeros(config.BOARD_SIZE * config.BOARD_SIZE)
             dist[priority_move[0] * config.BOARD_SIZE + priority_move[1]] = 1.0
-            return dist, priority_move
+            return dist, priority_move"""
 
         self.search(game_state)
         # generate policy from root children visit counts
