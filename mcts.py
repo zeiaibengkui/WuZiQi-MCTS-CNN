@@ -68,46 +68,35 @@ class MCTS:
                 policy = policy.cpu().numpy()[0]
                 value = value.cpu().numpy()[0][0]
 
-                # critical moves: five / open four / open three priority
-                critical = game_copy.find_critical_moves()
-                if critical["win"]:
-                    valid_moves = critical["win"]
-                elif critical["block"]:
-                    valid_moves = critical["block"]
-                elif critical["open_four"]:
-                    valid_moves = critical["open_four"]
-                # elif critical["open_three"] :
-                #     valid_moves = critical["open_three"]
+                # only keep first move fixed in center; second move forced in center 5x5;
+                # from move 3 onward, search neighbourhood of opponent's last move and own last move
+                if len(game_copy.move_history) == 1:
+                    # second move: center 5x5 area (5-9, 5-9)
+                    valid_moves = [
+                        move
+                        for move in game_copy.get_valid_moves()
+                        if 5 <= move[0] <= 9 and 5 <= move[1] <= 9
+                    ]
+                elif len(game_copy.move_history) >= 2:
+                    last_r, last_c, _ = game_copy.move_history[-1]
+                    prev_r, prev_c, _ = game_copy.move_history[-2]
+                    focused = set()
+                    radius = 2
+                    for center_r, center_c in [(last_r, last_c), (prev_r, prev_c)]:
+                        for dr in range(-radius, radius + 1):
+                            for dc in range(-radius, radius + 1):
+                                nr, nc = center_r + dr, center_c + dc
+                                if (
+                                    0 <= nr < config.BOARD_SIZE
+                                    and 0 <= nc < config.BOARD_SIZE
+                                    and game_copy.board[nr, nc] == 0
+                                ):
+                                    focused.add((nr, nc))
+                    valid_moves = (
+                        list(focused) if focused else game_copy.get_valid_moves()
+                    )
                 else:
-                    # only keep first move fixed in center; second move forced in center 5x5;
-                    # from move 3 onward, search neighbourhood of opponent's last move and own last move
-                    if len(game_copy.move_history) == 1:
-                        # second move: center 5x5 area (5-9, 5-9)
-                        valid_moves = [
-                            move
-                            for move in game_copy.get_valid_moves()
-                            if 5 <= move[0] <= 9 and 5 <= move[1] <= 9
-                        ]
-                    elif len(game_copy.move_history) >= 2:
-                        last_r, last_c, _ = game_copy.move_history[-1]
-                        prev_r, prev_c, _ = game_copy.move_history[-2]
-                        focused = set()
-                        radius = 2
-                        for center_r, center_c in [(last_r, last_c), (prev_r, prev_c)]:
-                            for dr in range(-radius, radius + 1):
-                                for dc in range(-radius, radius + 1):
-                                    nr, nc = center_r + dr, center_c + dc
-                                    if (
-                                        0 <= nr < config.BOARD_SIZE
-                                        and 0 <= nc < config.BOARD_SIZE
-                                        and game_copy.board[nr, nc] == 0
-                                    ):
-                                        focused.add((nr, nc))
-                        valid_moves = (
-                            list(focused) if focused else game_copy.get_valid_moves()
-                        )
-                    else:
-                        valid_moves = game_copy.get_valid_moves()
+                    valid_moves = game_copy.get_valid_moves()
 
                 # filter illegal move probabilities
                 policy_vec = np.zeros(config.BOARD_SIZE * config.BOARD_SIZE)
