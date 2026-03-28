@@ -48,6 +48,7 @@ class Trainer:
         self.longest_game = (
             None  # store the longest game object from last competition round
         )
+        self.steps = 1
 
     def self_play(self):
         g = game.GomokuGame()
@@ -77,19 +78,18 @@ class Trainer:
         winner = g.winner
         total_steps = len(g.move_history)
         # long game reward factor: more steps -> higher win reward (max 2x), lower loss penalty (min 0.5x)
-        length_factor = np.log(max(total_steps - 10, 1)) * 0.3
+        # length_factor = np.log(max(total_steps - 10, 1)) * 0.3
 
         rewards = []
         for i in range(len(states)):
             # for each step, if final winner is the player of that step, reward = 1 * length_factor, else -1 * loss_factor
             step_player = 1 if i % 2 == 0 else -1
             if winner == step_player:
-                rewards.append(1.0 * length_factor + 1)
+                rewards.append(1.0)
             elif winner == 0:
-                rewards.append(0.9 * length_factor + 1)
+                rewards.append(0)
             else:
-                loss_factor = np.max((0.2, 1 - length_factor))
-                rewards.append(-1.0 * loss_factor)
+                rewards.append(-1.0)
 
         return states, mcts_policies, rewards, g
 
@@ -106,14 +106,17 @@ class Trainer:
             print(f"\n--- Competition round (iteration {self.iteration + 1}) ---")
             longest_game = self.competition_round()
             self._update_best_index()
-            winrate = lambda idx: self.wins[idx] / (
+            win_rate = lambda idx: self.wins[idx] / (
                 self.wins[idx] + self.losses[idx] + self.draws[idx]
             )
-            print(
-                f"Best model: {self.best_index} (win rate: {winrate(self.best_index):.2f})"
-            )
+
             # record longest game if available
             if longest_game is not None:
+                # output example game (the longest game)
+                # print("Example game final state:")
+                longest_game.print_board()
+
+                # Save
                 longest_moves = len(longest_game.move_history)
                 if longest_moves > self.longest_game_length:
                     self.longest_game_length = longest_moves
@@ -127,19 +130,11 @@ class Trainer:
                     print(
                         f"New longest game ({longest_moves} moves)，model saved: {best_path}"
                     )
-                # output example game (the longest game)
-                # print("Example game final state:")
-                game.print_board(longest_game.board)
-                """ print("Move order:")
-                for step, (r, c, p) in enumerate(longest_game.move_history):
-                    player = "black" if p == 1 else "white"
-                    print(f"Move {step+1}: {player} ({r}{chr(ord('a') + c)})")
-                if longest_game.winner == 0:
-                    print("Result: draw")
-                elif longest_game.winner == 1:
-                    print("Result: black wins")
-                else:
-                    print("Result: white wins") """
+
+                print(
+                    f"Best model: {self.best_index} "
+                    f"(win rate: {win_rate(self.best_index):.2f})"
+                )
 
         # Train losing models using their loss data
         total_loss = 0.0
@@ -224,14 +219,17 @@ class Trainer:
                     if idx != self.best_index and self.game_data[idx]
                 ]
             )
-            """  print(
-                f"Average loss: {avg_loss:.4f} (Val: {avg_val:.4f}, Pol: {avg_pol:.4f})"
-            ) """
+            print(
+                f"Average loss: {avg_loss:.4f}"
+                f" (Val: {avg_val:.4f}, Pol: {avg_pol:.4f})"
+            )
         else:
             print("No training data for losing models.")
 
-        torch.save(self.population[self.best_index].state_dict(), config.MODEL_PATH)
-        print(f"Model saved to {config.MODEL_PATH}")
+        self.steps += 1
+        if self.steps % 30 == 1:
+            torch.save(self.population[self.best_index].state_dict(), config.MODEL_PATH)
+            print(f"Model saved to {config.MODEL_PATH}")
 
     def load_model(self):
         if os.path.exists(config.MODEL_PATH):
@@ -383,7 +381,7 @@ class Trainer:
             for j in range(i + 1, n):
                 sleep(0.7)
                 # reduce history once per pair
-                hist = 0.8
+                hist = 0.1
                 self.wins[i] *= hist
                 self.losses[i] *= hist
                 self.draws[i] *= hist
@@ -391,7 +389,7 @@ class Trainer:
                 self.losses[j] *= hist
                 self.draws[j] *= hist
 
-                for game_idx in range(config.GAMES_PER_ITER):
+                for game_idx in range(config.GAMES_PER_ITER * 2):
                     print(f"Game {game_idx+1}", end="\r")
 
                     # Determine colors: even game_idx -> i black, j white; odd -> j black, i white

@@ -67,8 +67,6 @@ class GomokuGame:
             length, open_ends = self._line_properties(tmp, r, c, dr, dc, player)
             if length >= 5:
                 return "five"
-            if length == 4 and open_ends >= 2:
-                return "dead_four"
             if length == 4 and open_ends >= 1:
                 return "open_four"
             if length == 3 and open_ends == 2:
@@ -89,10 +87,6 @@ class GomokuGame:
                 win_moves.append(move)
             elif self.evaluate_move(move, opp) == "five":
                 block_moves.append(move)
-            elif self.evaluate_move(move, opp) == "dead_four":
-                block_moves.append(move)
-            elif self.evaluate_move(move, cur) == "dead_four":
-                win_moves.append(move)
             elif self.evaluate_move(move, cur) == "open_four":
                 open_four_moves.append(move)
             elif self.evaluate_move(move, cur) == "open_three":
@@ -154,6 +148,7 @@ class GomokuGame:
         self.move_history.append((r, c, self.current_player))
         self.is_terminal()
         self.current_player = -self.current_player
+        # self.print_board()
         return True
 
     def undo_move(self):
@@ -181,16 +176,32 @@ class GomokuGame:
             1 if self.winner == self.current_player else -1
         )  # reward relative to last player
 
+    def print_board(self, show_move=False):
+        print("\033[2J\033[H", end="", flush=True)
+        board = self.board
+        print(
+            "    " + "".join(f"{chr(ord('a') + i):2}" for i in range(config.BOARD_SIZE))
+        )
+        for r in range(config.BOARD_SIZE):
+            row_str = f"{r:2} "
+            for c in range(config.BOARD_SIZE):
+                if board[r, c] == 1:
+                    row_str += " ●"
+                elif board[r, c] == -1:
+                    row_str += " ○"
+                else:
+                    row_str += " ."
+            print(row_str)
 
-def print_board(board):
-    print("    " + "".join(f"{chr(ord('a') + i):2}" for i in range(config.BOARD_SIZE)))
-    for r in range(config.BOARD_SIZE):
-        row_str = f"{r:2} "
-        for c in range(config.BOARD_SIZE):
-            if board[r, c] == 1:
-                row_str += " ●"
-            elif board[r, c] == -1:
-                row_str += " ○"
-            else:
-                row_str += " ."
-        print(row_str)
+        if not show_move:
+            return
+        print("Move order:")
+        for step, (r, c, p) in enumerate(self.move_history):
+            player = "black" if p == 1 else "white"
+            print(f"Move {step+1}: {player} ({r}{chr(ord('a') + c)})")
+        if self.winner == 0:
+            print("Result: draw")
+        elif self.winner == 1:
+            print("Result: black wins")
+        else:
+            print("Result: white wins")

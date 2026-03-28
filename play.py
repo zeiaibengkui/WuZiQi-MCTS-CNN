@@ -36,7 +36,7 @@ def human_vs_ai():
     else:
         print("You play black first.")
 
-    game.print_board(g.board)
+    g.print_board()
 
     while not g.is_terminal():
         if g.current_player == human_color:
@@ -72,7 +72,7 @@ def human_vs_ai():
                 print("AI resigns (no legal moves)")
                 break
 
-        game.print_board(g.board)
+        g.print_board()
 
     if g.winner == 0:
         print("Draw!")

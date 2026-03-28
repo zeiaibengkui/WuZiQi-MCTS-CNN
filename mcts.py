@@ -147,11 +147,11 @@ class MCTS:
 
     def get_action_distribution(self, game_state: game.GomokuGame, temperature=1):
         # priority move from game's critical moves (human vs AI will also go through this)
-        """priority_move = game_state.get_priority_move()
+        priority_move = game_state.get_priority_move()
         if priority_move is not None:
             dist = np.zeros(config.BOARD_SIZE * config.BOARD_SIZE)
             dist[priority_move[0] * config.BOARD_SIZE + priority_move[1]] = 1.0
-            return dist, priority_move"""
+            return dist, priority_move
 
         self.search(game_state)
         # generate policy from root children visit counts
@@ -166,22 +166,22 @@ class MCTS:
             dist = np.zeros(config.BOARD_SIZE * config.BOARD_SIZE)
             dist[best_move[0] * config.BOARD_SIZE + best_move[1]] = 1.0
             return dist, best_move
-        else:
-            # apply temperature
-            counts = counts ** (1 / temperature)
-            counts_sum = np.sum(counts)
-            if counts_sum == 0:
-                # no children (edge case), random choice
-                valid = game_state.get_valid_moves()
-                if not valid:
-                    return None, None
-                move = random.choice(valid)
-                dist = np.zeros(config.BOARD_SIZE * config.BOARD_SIZE)
-                dist[move[0] * config.BOARD_SIZE + move[1]] = 1.0
-                return dist, move
 
-            probs = counts / counts_sum
-            # sample
-            move_idx = np.random.choice(len(probs), p=probs)
-            move = (move_idx // config.BOARD_SIZE, move_idx % config.BOARD_SIZE)
-            return probs, move
+        # apply temperature
+        counts = counts ** (1 / temperature)
+        counts_sum = np.sum(counts)
+        if counts_sum == 0:
+            # no children (edge case), random choice
+            valid = game_state.get_valid_moves()
+            if not valid:
+                return None, None
+            move = random.choice(valid)
+            dist = np.zeros(config.BOARD_SIZE * config.BOARD_SIZE)
+            dist[move[0] * config.BOARD_SIZE + move[1]] = 1.0
+            return dist, move
+
+        probs = counts / counts_sum
+        # sample
+        move_idx = np.random.choice(len(probs), p=probs)
+        move = (move_idx // config.BOARD_SIZE, move_idx % config.BOARD_SIZE)
+        return probs, move
